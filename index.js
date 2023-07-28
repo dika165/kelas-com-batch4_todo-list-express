@@ -5,9 +5,8 @@
 
 
 import express from 'express';
-import { nanoid } from 'nanoid';
+import * as TaskService from './services/taskService.js';
 
-const tasks = [];
 
 const app = express();
 const port = 8080;
@@ -15,43 +14,19 @@ const host = "localhost";
 
 app.use(express.json());
 
-app.get("/tasks", (req, res) => {
-    res.json(tasks);
-});
+app.get("/tasks", (req, res) => TaskService.getAllTask(req,res));
 
-app.get("/tasks/:id", (req, res) => {
-    const id = req.params.id;
-
-    const task = tasks.find(item => item.id === id);
-    if (task) {
-        res.json(task);
-    } else {
-        res.json({message:"task tidak ditemukan!"});
-    }
-
-})
+app.get("/tasks/:id", (req, res) => TaskService.getById(req, res));
 
 app.post("/tasks", (req, res) => {
-    const task= {};
-    task.id = nanoid(6);
-    task.name = req.body.name;
-    task.completed = req.body.completed;
-
-    tasks.push(task);
-    
-    res.json(task);
+    TaskService.createTask(req, res);
 });
 
 app.put("/tasks/:id", (req, res) => {
-    const id = req.params.id;
-    let name = req.body.name;
-    let completed  = req.body.completed
-    const idx = tasks.findIndex(item => item.id === id);
+    TaskService.updateTask(req, res);
+});
 
-    if (idx > -1) {
-        tasks[idx] = {}
-    }
-})
+app.delete("/tasks/:id",(req, res) => TaskService.deleteTask(req,res));
 
 app.listen(port, host, () =>{
     console.log(`server berjalan pada http://${host}:${port}`);
